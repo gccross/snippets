@@ -7,45 +7,37 @@
 #include <vector>
 using namespace std;
 
-vector<string>  split_words(istream  * const is)
-{
-
-	string line, word;
-	vector<string> words;
-	istringstream iss;
-	while (getline(*is,line))
-	{
-		iss.str(line);
-		for_each(istream_iterator<string>(iss), istream_iterator<string>(), [&words](const string& s){words.push_back(s);});
-		iss.clear();
-	}
-	return words;
-}
-
 int main(int argc, const char * const * argv)
 {
 	ifstream ifs;
-	istream *is;
 	if (1<argc) {
 		ifs.open(argv[1]);
-		is = &ifs;
-	} else {
-		is = &cin;
+		cin.rdbuf(ifs.rdbuf());
+		cin.tie(&cout);
 	}
 
-	vector<string> words(split_words(is));
+	vector<string> words;
+	string word;
+	auto it(back_inserter(words));
+	while (cin >> word)  *it = word; 
+	// could use this too:
+	//copy (istream_iterator<string>(*is),istream_iterator<string>(), back_inserter(words));
 
-	//verify
 	for (auto&& i: words) cout << i << endl;
 	cout << endl << "word count: " << words.size() << endl;
 
-	cout << "verify with wc: " ;
+	//verify with wc if we have a file
+	if (1 == argc) return 0;
 
-	is->clear();
-	is->seekg(0, ios::beg);
-	FILE* f = popen("wc -w "  ,"r+");
-	char output[256];
-	while (!feof(f)) if (fgets(output, 256, f)!=NULL) cout << output; 
+	string cmd("wc -w ");
+	cmd += argv[1];
+	cout << "verify with `" << cmd << "`:";
+	cout.flush();
+
+	FILE* f = popen(cmd.c_str(),"r+");
+	const uint MAX_LINE = 2048;
+	char line[MAX_LINE];
+	while (NULL!=fgets(line,MAX_LINE,f)) cout << line; 
 	fflush(f);
 	pclose(f);
 	return 0;
