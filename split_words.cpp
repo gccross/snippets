@@ -34,10 +34,9 @@ int main(int argc, const char * const * argv)
 	cout << "verify with `" << cmd << "`:";
 	cout.flush();
 
-	FILE* f = popen(cmd.c_str(),"r+");
+	FILE* f = popen(cmd.c_str(),"w");
 	const uint MAX_LINE = 2048;
 	char line[MAX_LINE];
-	while (NULL!=fgets(line,MAX_LINE,f)) cout << line; 
 	fflush(f);
 	pclose(f);
 	return 0;
