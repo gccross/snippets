@@ -31,12 +31,9 @@ int main(int argc, const char * const * argv)
 
 	string cmd("wc -w ");
 	cmd += argv[1];
-	cout << "verify with `" << cmd << "`:";
-	cout.flush();
+	cout << "verify with `" << cmd << "`:\n";
 
 	FILE* f = popen(cmd.c_str(),"w");
-	const uint MAX_LINE = 2048;
-	char line[MAX_LINE];
 	fflush(f);
 	pclose(f);
 	return 0;
