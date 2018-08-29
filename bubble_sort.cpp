@@ -17,7 +17,7 @@ FwdIter bubble_sort(FwdIter begin, FwdIter end)
 	{
 		for (FwdIter j=i; j!=end; ++j)
 		{
-			if (*i>*j)
+			if (*i>*j) //uhhh, std::swap?
 			{
 				itt temp = *i;
 				*i = *j;
@@ -38,12 +38,13 @@ size_t calculate_paths(size_t rows, size_t columns)
 int main()
 {
 	int x[]{68,43,2,39,90,55};
+	size_t x_len = sizeof(x)/sizeof(x[0]);
 	vector<int>  mysequence {3,46,43,98,27};
 	bubble_sort(mysequence.begin(),mysequence.end());
 	copy(mysequence.begin(), mysequence.end(), ostream_iterator<int>(cout, " "));
 	auto f([](){cout << endl; });
 	f();
-	copy(bubble_sort(x, x+sizeof(x)/sizeof(x[0])), x+sizeof(x)/sizeof(x[0]), ostream_iterator<int>(cout, " "));
+	copy(bubble_sort(x, x+x_len), x+x_xlen, ostream_iterator<int>(cout, " "));
 	f();
 
 	for (size_t i=0; ++i < 8; ) 
