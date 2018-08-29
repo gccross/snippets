@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <numeric>
-#include <set>
+#include <unordered_set>
 #include <vector>
 using namespace std;
 
@@ -13,33 +13,32 @@ using namespace std;
 // [2, 1, 1, 2, 3] => 2*2 + 2*1 + 1*3 => 9
 // {2, 1, 3} => 2*2 + 2*1 + 2*3 => 12
 
-template <typename InputIt, typename T=typename InputIt::value_type>
+template <typename InputIt>
 InputIt find_single(InputIt beg, InputIt end)
 {
-	set<T> s;
-	for (InputIt it=beg; ++it!=end;)
-	{
-		s.insert(*it);
-	}
-
+	typedef typename iterator_traits<InputIt>::value_type T;
+	unordered_set<T> s{beg, end};
+	
 	T sum1{accumulate(beg, end, 0)};
 	T sum2{accumulate(s.begin(), s.end(), 0)};
 
 	return find(beg, end, 2*sum2 - sum1);
 }
 
-template <typename T>
-T* find_single(T* beg, T* end)
-{
-	return find_single<T*, T>(beg, end);
-}
 
 int main()
 {
 	int x[]{ 87, 89, 88, 87, 88, 89, 42, 48, 49, 49, 42, 48, 5 };
-	vector<int> v(x,x+sizeof(x)/sizeof(x[0]));
-	cout << *(find_single(v.begin(), v.end())) << endl;
-	cout << *(find_single(x, x+sizeof(x)/sizeof(x[0]))) << endl;
+	size_t x_len = sizeof(x)/sizeof(x[0]);
+	vector<int> v(x,x+x_len);
+	int* it1;
+
+	if ((it1=find_single(x, x+x_len))!=x+x_len) 
+		cout << *it1 << endl;
+	
+	vector<int>::iterator it2;
+	if ((it2=find_single(v.begin(), v.end()))!=v.end()) 
+		cout << *it2 << endl;
 	return 0;
 }
 
