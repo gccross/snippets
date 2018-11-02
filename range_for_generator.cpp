@@ -31,7 +31,6 @@ public:
 	public:
 		iterator(T& v, T _step): elem(v), step(_step) {}
 		const T& operator* () const { return elem; }
-		//T* operator-> () const { return &elem; } // as some point I got compile error for not providing this with operator*
 		iterator& operator++ () { elem+=step; return *this; }
 
 	private: 
