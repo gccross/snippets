@@ -52,6 +52,7 @@ struct Sum {
 
 typedef typename Sum<Frak<4,5>,Frak<8,9>>::result myFrak;
 typedef typename Simplify<myFrak>::result mySimpleFrak;
+typedef typename ScalarMultiplication<3, string>::result three_strings;
 
 int main () 
 {
@@ -100,6 +101,7 @@ int main ()
 
 	cout <<  "\n\nFrak Fun: ";
 	cout << myFrak::Num << "/" << myFrak::Den << "\t Simplified: " << mySimpleFrak::Num << "/" << mySimpleFrak::Den << endl;
+	cout << "Three strings: " << three_strings ; 
 
 	return 0;
 }

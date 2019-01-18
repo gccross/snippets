@@ -26,7 +26,8 @@ using namespace std;
 //	T^(F|T&F)^T
 //	T^(F|(T&F))^T
 
-vector<string> gen_parenthesizations(const char * const expression)
+template <typename Iter>
+vector<string> gen_parenthesizations(Iter _begin, Iter _end)
 {
 
 	vector<string> v;
