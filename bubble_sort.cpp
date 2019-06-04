@@ -6,6 +6,7 @@
 using namespace std;
 
 // bubble sort, and calculating paths in a 2-D matrix
+// SAP question
 
 typedef vector<int>::pointer itv;
 typedef vector<int>::value_type itt;     
@@ -44,7 +45,7 @@ int main()
 	copy(mysequence.begin(), mysequence.end(), ostream_iterator<int>(cout, " "));
 	auto f([](){cout << endl; });
 	f();
-	copy(bubble_sort(x, x+x_len), x+x_xlen, ostream_iterator<int>(cout, " "));
+	copy(bubble_sort(x, x+x_len), x+x_len, ostream_iterator<int>(cout, " "));
 	f();
 
 	for (size_t i=0; ++i < 8; ) 

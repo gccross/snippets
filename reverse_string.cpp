@@ -1,3 +1,7 @@
+// reverse a string 
+// also demonstrates printing types at compile-time
+// also lambda 
+
 #include <algorithm>
 #include <cstring>
 #include <iostream>
@@ -15,14 +19,22 @@ unique_ptr<char> reverse(const char * const p)
 	return result;
 }
 
+
+// A little mechanism to have the compiler tell us types deduced
+template <typename T> 
+struct FD;
+auto f = [](auto&& T){ typename FD<decltype(T)>::type x; };
+
 int main (int argc, const char* const argv[])
 {
 	char const *p = "seven";
 	unique_ptr<char> p2 = reverse(p);
 
-	auto f0 = [&p2](){ cout << p2 << endl; };
+	f(p2); // force compiler error to determine the type of p2
 
-	f0();
+	auto f0 = [](char* p){ cout << p << endl; };
+
+	f0(p2.get());
 
 	//same thing but in place. lambda just for giggles, should use std::swap()
 	auto f1 = [&p2]() mutable { 
@@ -37,7 +49,15 @@ int main (int argc, const char* const argv[])
 	};
 
 	f1();
-	f0();
+	f0(p2.get());
 
+	// using swap and iterators, in place
+	string s("Who has seen the wind?");
+	auto f2 = [&s]() {
+		for (string::iterator i=s.begin(), j=s.end()-1; i<j ; ++i, --j)
+			swap(*i,*j);
+	};
+	f2();
+	f0(s.data());
 	return 0;
 }

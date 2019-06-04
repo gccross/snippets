@@ -1,6 +1,4 @@
-#include <algorithm>
 #include <iostream>
-#include <iterator>
 #include <random>
 #include <vector>
 #include <utility>
@@ -20,6 +18,8 @@ int main (int argc, char const * argv[])
 		for (int &i: v) i = gen(mt); 
 		copy(v.begin(), v.end(), ostream_iterator<decltype(v)::value_type>(cout, " "));
 		cout << endl;
+
+		transform(v.begin(), v.end(),v.begin(), [&mt,&gen](int i) { return i+ gen(mt); });
 
 		int random_value = v[0];
 		using vit_t = vector<int>::iterator;
@@ -43,28 +43,22 @@ int main (int argc, char const * argv[])
 	// try again, but using erase-remove idiom
 	
 	{
-		random_device rd;
-		mt19937 mt(rd());
-		uniform_int_distribution<> uid(0,17);
-		vector<int> v(71, 0);
+		vector<int> v{5, 5, 5, 7, 8, 9};
 
 		using vit_t = vector<int>::iterator;
-
-		transform(v.begin(), v.end(),v.begin(), [&mt,&uid](int i) { return i+ uid(mt); });
 
 		copy(v.begin(), v.end(), ostream_iterator<int>(cout, " "));
 		cout << endl;
 		
-		int random_value = v[0];
+		int random_value = v[3];
 		vit_t it(v.begin()), it2(v.begin());
 
 		// remove.  O(n), preserve order
-		while (it!=v.end())
-		{
+		while (it!=v.end()) {
 			if (random_value != *it) *it2++ = *it;
 			++it;
 		}
-		
+
 		v.erase(it2, v.end());
 		copy(v.begin(), v.end(), ostream_iterator<int>(cout, " "));
 		cout << endl;

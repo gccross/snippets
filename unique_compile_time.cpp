@@ -6,7 +6,7 @@
 //
 // Startup locale will be 'C'.  So we need to imbue en_US (latin1?) on wcout to display the wide characters.
 //
-// :w
+// 
 #include <algorithm>
 #include <iostream>
 #include <locale>
@@ -95,7 +95,7 @@ int main()
 	locale::global(locale(setlocale(LC_ALL, ""))); // this works.  LANG env variable needs to be en_US.UTF-8 for this exercise below.
 
 	// you need to imbue wcout with en_US, to convert wchar_t to UTF-8 
-	wcout.imbue(locale("en_US.UTF-8") );
+	wcout.imbue(locale("en_US.UTF-8"));
 
 	// print the unique static const array of international characters.
 	for (auto&&  i : A::data) wcout << i << L'\t';

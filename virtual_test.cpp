@@ -26,26 +26,26 @@ class derived2: public derived {
 
 class Base
 {
-public:
-    int f(int i)
-    {
-        cout << "f(int): ";
-        return i+3;
-    }
+	public:
+		virtual int f(int i)
+		{
+			cout << "f(int) Base: ";
+			return i+3;
+		}
 };
 class Derived : public Base
 {
-public:
-    int f(int i)
-    {
-        cout << "f(int): ";
-        return i+3;
-    }
-    double f(double d)
-    {
-        cout << "f(double): ";
-        return d+3.3;
-    }
+	public:
+		int f(int i) 
+		{
+			cout << "f(int) Derived: ";
+			return i+3;
+		}
+		double f(double d) 
+		{
+			cout << "f(double) Double: ";
+			return d+3.3;
+		}
 };
 
 void print(base &b) {
@@ -59,9 +59,9 @@ int main(void) {
 	print(b);
 	print(d);
 	print(dd);
-	Derived* dp = new Derived;
-	cout << dp->f(3) << '\n';
-	cout << dp->f(3.3) << '\n';
-	delete dp;
+	Derived D;
+	Base& dp (D);
+	cout << dp.f(3) << '\n';
+	cout << dp.f(3.3) << '\n';
 	return 0;
 }
