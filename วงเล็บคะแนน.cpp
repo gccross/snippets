@@ -40,7 +40,7 @@ unsigned score(InputIt first, InputIt last)
 	unsigned result(0);
 	if (close_brace == first) result = 0;
 	else if (++first == close_brace) result = 1;
-	else result = 2*score(last,close_brace);
+	else result = 2*score(first,close_brace);
 
 	result+=score(++close_brace,last);
 
