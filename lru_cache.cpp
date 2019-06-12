@@ -55,7 +55,7 @@ class LRUCache
 				// need to make atomic/exception safe
 				order_map.erase(res->second.order);
 				res->second.order = ++global_order;
-				order_map[res->second.order] = key;
+				order_map.insert({res->second.order, key});
 					
 				return res->second.value; 
 			}
@@ -63,26 +63,20 @@ class LRUCache
 		}
 
 		void set(K key ,V value) { 
-			if (lru_map.max_size() == lru_map.size()) {
-				K lrukey = order_map.begin()->second;		
-				global_order_type orderkey = lru_map[lrukey].order;
+
+			global_order_type new_order_val( ++global_order);
+			global_order_type old_order_val(lru_map[key].order);
+
+			if (!lru_map.insert({key,LRUValue{value, new_order_val}}).second) {
+				// element already exists 
+				
+				lru_map[key] = LRUValue{value, new_order_val};
+				order_map.erase(old_order_val);
+				
+			} 
+
+			order_map.insert({new_order_val, key});
 			
-				// need to make atomic/exception safe
-				lru_map.erase(lrukey);		
-				order_map.erase(order_map.begin());
-
-			}
-
-			global_order_type new_order_val = ++global_order;
-			lru_map_iterator_type res = lru_map.find(key); 
-			if (res != lru_map.end()) {
-
-				// need to make atomic/exception safe
-				order_map.erase(res->second.order);
-				res->second.order = new_order_val;
-				order_map[res->second.order] = key;
-			}
-			lru_map[key] = LRUValue{value,new_order_val}; // can template params be deduced? 
 		}
 };
 
