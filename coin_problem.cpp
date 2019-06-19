@@ -101,44 +101,43 @@ int main(int argc, const char* const argv[]) {
 	coin_reverse_iterator_type combo_basis(coin_stack.rbegin());
 	coin_iterator_type denomination_iterator;
 	unsigned res(numeric_limits<unsigned>::max());
+	unsigned remainder(V);
 
 	// now, let's get to calclating
-	do {
-		unsigned remainder(V);
 
-		// find combos of coins that total V
-		while (remainder && coin_stack.rend()!= combo_basis ) {
+	// find combos of coins that total V
+	while (remainder && *coin_stack.begin()!=*coin_purse.rbegin() ) {
 
-			// position the denomination pointer to the next smaller denomination
-			denomination_iterator = find(coin_purse.begin(), coin_purse.end(), *combo_basis);
-			++denomination_iterator;  
+		// position the denomination pointer to the next smaller denomination
+		denomination_iterator = find(coin_purse.begin(), coin_purse.end(), *combo_basis);
+		++denomination_iterator;  
 
-			// pop the next coin from the base, so we can build another coin combo
-			coin_stack.erase(--(combo_basis++).base(),coin_stack.end());
+		// pop the next coin from the base, so we can build another coin combo
+		coin_stack.erase(--(combo_basis++).base(),coin_stack.end());
 
-			// start at the lowest denomination of coin_stack if is the first time through)
-			if (coin_stack.rend() == combo_basis && coin_purse.end()!=denomination_iterator) --denomination_iterator;
+		// start at the lowest denomination of coin_stack if is the first time through)
+		if (coin_stack.rend() == combo_basis && coin_purse.end()!=denomination_iterator) --denomination_iterator;
 
-			// now calculate the new remainder
-			remainder = V - accumulate(coin_stack.begin(), coin_stack.end(), 0);
+		// now calculate the new remainder
+		remainder = V - accumulate(coin_stack.begin(), coin_stack.end(), 0);
 
-			// now with the remaining denominations, try to make the total again
-			for (; denomination_iterator != coin_purse.end(); ++denomination_iterator)
-			{
-				unsigned quotient = remainder / *denomination_iterator;
-				coin_stack.insert(coin_stack.end(), quotient, *denomination_iterator);
-				remainder = remainder % *denomination_iterator;
-			}
-
-			combo_basis = coin_stack.rbegin();
+		// now with the remaining denominations, try to make the total again
+		for (; denomination_iterator != coin_purse.end(); ++denomination_iterator)
+		{
+			unsigned quotient = remainder / *denomination_iterator;
+			if (quotient) coin_stack.insert(coin_stack.end(), quotient, *denomination_iterator);
+			remainder = remainder % *denomination_iterator;
 		}
 
-		if (!remainder) {
-			unsigned new_res =  coin_stack.size();
-			if (res > new_res) res = new_res;
-		}
+		// adjust the combo basis, to consider combos with the additional smaller denominations
+		combo_basis = coin_stack.rbegin();
+		if (*coin_stack.begin() != *coin_stack.rbegin())
+			while (*coin_stack.rbegin() == *combo_basis)  ++combo_basis;
+	}
 
-	} while (coin_stack.rend() != combo_basis && coin_stack.size() < 150);  // this could be a long time, if no combos can work
+	if (!remainder) {
+		res =  coin_stack.size();
+	}
 
 	cout << (numeric_limits<unsigned>::max() == res ? -1 : res)  << endl;
     }

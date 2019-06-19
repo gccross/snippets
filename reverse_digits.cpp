@@ -11,7 +11,7 @@ int main(int argc, const char* const argv[]){
 	cin >> n_testcases;
 	while (n_testcases--) {
 		string value;
-		ostringstream reversed;
+		stringstream reversed;
 		cin >> value;
 		for (string::reverse_iterator it = value.rbegin(); 
 				it != value.rend() ;
@@ -25,6 +25,11 @@ int main(int argc, const char* const argv[]){
 		while ('0' == reversed.str()[pos]) reversed.seekp(++pos);
 
 		cout << reversed.str().substr(pos) << endl;
+
+		// or we could stream it in
+		reversed.seekp(ios::beg);
+		reversed >> pos;
+		cout << pos << endl;
 
 	}
 	return 0;
