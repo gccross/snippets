@@ -52,13 +52,15 @@
 #include <functional>
 #include <limits>
 #include <iostream>
-#include <iterator>
 #include <numeric>
 #include <string>
 #include <sstream>
 #include <vector>
+
+
 using namespace std;
 
+// given an existing stack of coins, and a purse, add to the stack with appropriate coins to total the amount desired
 int main(int argc, const char* const argv[]) {
 
     unsigned n_tests(0);
@@ -67,12 +69,12 @@ int main(int argc, const char* const argv[]) {
         unsigned V(0), N(0) ;
         cin >> V >> N;
 
-	// next line of input is the set of coin denominations.  we call it the purse. 
-	typedef vector<unsigned> coin_purse_type;
-	typedef coin_purse_type::iterator coin_iterator_type;
-	typedef coin_purse_type::reverse_iterator coin_reverse_iterator_type;
-        coin_purse_type coin_purse;
-        coin_purse.reserve(N);
+	// next line of input is the set of coin denominations.  
+	typedef vector<pair<unsigned,unsigned>> coin_stack_type;
+	typedef coin_stack_type::iterator coin_iterator_type;
+	typedef coin_stack_type::reverse_iterator coin_reverse_iterator_type;
+
+        coin_stack_type coin_stack;
 
 	// read it as a whole line
         string line;
@@ -81,63 +83,95 @@ int main(int argc, const char* const argv[]) {
         istringstream s(line);
 	
 	// denominations have been read, now put into a structure
-        copy(istream_iterator<unsigned>(s), istream_iterator<unsigned>(), back_insert_iterator<coin_purse_type>(coin_purse));
+	{
+		vector<unsigned> temp;
+		copy(istream_iterator<unsigned>(s), istream_iterator<unsigned>(), back_insert_iterator<vector<unsigned>>(temp));
 
-	// sort and unique them
-	sort(coin_purse.begin(), coin_purse.end(),greater<unsigned>()); 
-	unique(coin_purse.begin(), coin_purse.end());
+		// sort and unique them
+		sort(temp.begin(), temp.end(),greater<unsigned>()); 
+		unique(temp.begin(), temp.end());
 
-	// sanity check
-	if (V < *coin_purse.rbegin()) { cout << -1 << endl; return 0; }
+		// sanity check
+		if (V < *temp.rbegin()) { cout << -1 << endl; return 0; }
 
+		for (vector<unsigned>::value_type& t: temp) coin_stack.push_back(make_pair(t, 0));
 
-	// the coin stack is a collection of the denominations provided which total the value we seek
-	// seed it with one coin of the first biggest denomination
-	coin_purse_type coin_stack; 
-	coin_stack.reserve(2048);
-	coin_stack.push_back(*coin_purse.begin());
+	} // end temp
+
+	// helper functions
+	const auto sum_coins = [](coin_iterator_type first,coin_iterator_type last)->unsigned long
+			{ 
+				unsigned long res(0);
+				for (coin_iterator_type it=first; last!=it; ++it) res+=it->first*it->second;
+				return res;
+			};
+	const auto sum_number_coins = [](coin_stack_type& cs)->unsigned 
+			{
+				unsigned long res(0);
+				for (coin_iterator_type it=cs.begin(); cs.end()!=it; ++it) res += it->second;
+				return res;
+			};
+	const auto more_combos = [] (coin_stack_type& cs) ->bool {
+				for (coin_iterator_type it = cs.begin(); cs.end()-1!=it; ++it) // all but the last
+					if (it->second) return true;
+				return false;
+			};
 
 	// other administriviae
-	coin_reverse_iterator_type combo_basis(coin_stack.rbegin());
-	coin_iterator_type denomination_iterator;
+	coin_iterator_type denomination_it;
+	coin_reverse_iterator_type denomination_reverse_it;
 	unsigned res(numeric_limits<unsigned>::max());
+	unsigned number_exact_change(0);
 	unsigned remainder(V);
 
 	// now, let's get to calclating
 
 	// find combos of coins that total V
-	while (remainder && *coin_stack.begin()!=*coin_purse.rbegin() ) {
+	do {
 
-		// position the denomination pointer to the next smaller denomination
-		denomination_iterator = find(coin_purse.begin(), coin_purse.end(), *combo_basis);
-		++denomination_iterator;  
-
-		// pop the next coin from the base, so we can build another coin combo
-		coin_stack.erase(--(combo_basis++).base(),coin_stack.end());
-
-		// start at the lowest denomination of coin_stack if is the first time through)
-		if (coin_stack.rend() == combo_basis && coin_purse.end()!=denomination_iterator) --denomination_iterator;
-
-		// now calculate the new remainder
-		remainder = V - accumulate(coin_stack.begin(), coin_stack.end(), 0);
-
-		// now with the remaining denominations, try to make the total again
-		for (; denomination_iterator != coin_purse.end(); ++denomination_iterator)
-		{
-			unsigned quotient = remainder / *denomination_iterator;
-			if (quotient) coin_stack.insert(coin_stack.end(), quotient, *denomination_iterator);
-			remainder = remainder % *denomination_iterator;
+		// find which domination we last used
+		for (denomination_reverse_it = coin_stack.rbegin(); 
+			denomination_reverse_it!=coin_stack.rend() && 0==denomination_reverse_it->second; 
+			++denomination_reverse_it);
+	
+		// if this is the first time through, (eg. stack is empty)
+		// start at the first denomination of coin_stack to build the next combo
+		if (coin_stack.rend() == denomination_reverse_it)
+			--denomination_reverse_it;
+		else if (coin_stack.rbegin() == denomination_reverse_it) {
+			// pop a coin off the base and build a new combo
+			coin_reverse_iterator_type coin_pop_it = denomination_reverse_it + 1;
+			while (coin_stack.rend() != coin_pop_it && 0 == coin_pop_it->second ) ++coin_pop_it;
+			if (coin_stack.rend() == coin_pop_it) break; // nothing more can do
+			else --coin_pop_it->second;		// pop a coin
+			denomination_reverse_it = --coin_pop_it; // start next denomination up
+		}  else {
+			--denomination_reverse_it->second; // pop a coin
+			--denomination_reverse_it; // start next denomination up
 		}
 
-		// adjust the combo basis, to consider combos with the additional smaller denominations
-		combo_basis = coin_stack.rbegin();
-		if (*coin_stack.begin() != *coin_stack.rbegin())
-			while (*coin_stack.rbegin() == *combo_basis)  ++combo_basis;
-	}
+		// now calculate the new remainder
+		remainder = V - sum_coins(coin_stack.begin(), --denomination_reverse_it.base());
 
-	if (!remainder) {
-		res =  coin_stack.size();
-	}
+		// now with the remaining denominations, try to make the total again
+		for (denomination_it = --denomination_reverse_it.base(); 
+			denomination_it != coin_stack.end(); 
+			++denomination_it)
+		{
+			unsigned quotient = remainder / denomination_it->first;
+			denomination_it->second = quotient;
+			remainder = remainder % denomination_it->first;
+		}
+
+
+		if (!remainder) {
+			++number_exact_change;
+			unsigned new_res = sum_number_coins(coin_stack);
+			if (res > new_res) res = new_res;
+			
+		}
+	} while (more_combos(coin_stack) && number_exact_change < 50); //enough at 50
+
 
 	cout << (numeric_limits<unsigned>::max() == res ? -1 : res)  << endl;
     }
