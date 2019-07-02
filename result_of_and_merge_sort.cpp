@@ -30,7 +30,8 @@ EmitType<typename retval<float (*)()>::type>::ugh Et; // matches specialization
 namespace george {
 
 	template <typename It> 
-	void merge (It first, It last, It pivot)
+		
+	void merge (It first, It last, It pivot) // <--- John feedback: remove this pivot it isn't necessary!
 	{
 		It it1 = first;
 		for (It it2 = pivot; it2 != last; ++it2) {
@@ -39,7 +40,7 @@ namespace george {
 			while (*it2 > *it1) ++it1;
 
 			// insert
-			typename It::value_type temp = *it1;
+			typename It::value_type temp = *it1;  // John feedback: std::move()
 			*it1 = *it2;
 			for (It it = it1+1; it<it2+1; ++it ) swap(temp, *it);
 		}
@@ -49,6 +50,8 @@ namespace george {
 	template <typename It> 
 	void sort(It first, It last)
 	{
+		// John feedback: handle empty range
+
 		// terminal case just one element 
 		if (first+1 == last) return;
 
