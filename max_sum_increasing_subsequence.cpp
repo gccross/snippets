@@ -1,101 +1,68 @@
 #include <algorithm>
-#include <numeric>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <iterator>
 #include <limits>
+#include <numeric>
 #include <utility>
 #include <vector>
 
 using namespace std;
 
 template <typename It>
-class solver {
+class solve 
+{
+public:
+	solve(size_t _N): N(_N) 
+	{ 
+		memoize = new uint64_t*[N-1];
+		for (size_t i = 0; i < N-1; ++i) { 
+			memoize[i] = new uint64_t[N];
+			fill(memoize[i], memoize[i]+N, numeric_limits<uint64_t>::max());
+		}
+	}
 
-public: 
-
-			
-	uint64_t solve(It const& first, It const& last)
+	uint64_t operator()(It prev, It first, It last)
 	{
-		if (first == last) return 0L;
-		if (1 == distance(first,last)) return *first;
+		instance_first = prev;
+		return do_solve(prev, first, last);
+	}
 
-		vector<It> vdb = make_sequence_decreasing_bases(first, last);
 
-		for (It it : vdb) { 
+private:
+	uint64_t do_solve(It prev, It first, It last)
+	{
+		uint64_t res = 0ULL;
+		if (0 == distance(first,last)) return *prev;
 
-			stack.clear();
-			uint64_t seq_sum=0UL, subseq_sum=0UL;
+		size_t row = distance(instance_first, prev);
+		size_t col = distance(instance_first, first);
 
-			It base = it, next = it;
+		if (memoize[row][col] != numeric_limits<uint64_t>::max()) 
+			res = memoize[row][col];
+		else if (*prev > *first) {
+
+			res = do_solve(prev, ++first, last);
+			memoize[row][col] = res;
+		}
+		else { 
+			It next = first;
 			++next;
 
-			subseq_sum = make_sequence_increasing(base, next, last);
-			seq_sum = subseq_sum;
+			uint64_t include = *prev + do_solve(first, next, last);
+			uint64_t exclude = do_solve(prev, next, last);
 
-			while (stack.size() > 1) {
-
-				//peel off the last element, 
-				subseq_sum -= *stack.back();
-				next = stack.back();
-				stack.pop_back();
-				
-				// and find a new path forward
-				base = stack.back();
-				++next;
-
-				subseq_sum += make_sequence_increasing(base, next, last);
-				seq_sum = max(seq_sum, subseq_sum);
-			}
-			max_sum = max(max_sum,seq_sum);
-		}		
-		return max_sum;
-	}
-
-	solver(size_t _N) :max_sum(0),N(_N) { 
-	}
-
-private: 
-
-	uint64_t make_sequence_increasing(It base, It next, It const& last) 
-	{
-		uint64_t sum{0UL};
-
-		if (stack.empty()) {
-			sum += *base;
-			stack.push_back(base);
+			res =  max(include, exclude);
+			memoize[row][col] = res;
 		}
-
-		while (next != last) {
-			if (*base < *next) {
-				sum+=*next;
-				stack.push_back(next);
-				base=next;
-			}
-			++next;
-		}
-		return sum;
+		return res;
 	}
 
-	vector<It>  make_sequence_decreasing_bases(It const& first, It const& last)
-	{
-		vector<It> v;
-		It base = first, next = first;
-		v.push_back(base);
-		while (++next != last) {
-			if (*base > *next) {
-				v.push_back(next);
-				base = next;
-			}
-		}
-		return v;
-	}
-
-	uint64_t max_sum;
 	size_t N;
-	vector<It> stack;
+	uint64_t **memoize;
+	It instance_first;
 };
-
 int main (int argc, char const * argv[])
 {
 	ifstream ifs;
@@ -109,10 +76,12 @@ int main (int argc, char const * argv[])
 	while (T--) {
 		size_t N;
 		cin >> N;
-		uint32_t a[N];
-		for (uint32_t& i: a) cin >> i;
+		uint32_t a[N+1];
+		a[0] = 0;
+		for (size_t i = 1; i<N+1; ++i) cin >> a[i];
 		
-		cout <<  solver<uint32_t*>(N).solve(a, a+N) << endl;
+		solve<uint32_t*> s(N+1);
+		cout << s(a, a+1, a+N+1) << endl;
 	}
 	return 0;
 
@@ -153,3 +122,13 @@ int main (int argc, char const * argv[])
 //	40 5 4 3 20 25
 //	Output of Online Judge is:
 //	50
+//
+//	For Input:
+//  1
+//  42
+//  468 335 501 170 725 479 359 963 465 706 146 282 828 962 492 996 943 828 437 392 605 903 154 293 383 422 717 719 896 448 727 772 539 870 913 668 300 36 895 704 812 323
+//  
+//  Its Correct output is:
+//  6974
+
+
