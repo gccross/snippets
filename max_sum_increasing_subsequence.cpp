@@ -10,64 +10,6 @@
 
 using namespace std;
 
-template <typename It>
-class solve 
-{
-public:
-	solve(size_t _N): N(_N) 
-	{ 
-		memoize = new uint64_t*[N];
-		for (size_t i = 0; i < N; ++i) { 
-			memoize[i] = new uint64_t[N+1];
-			fill(memoize[i], memoize[i]+N+1, numeric_limits<uint64_t>::max());
-		}
-	}
-
-	uint64_t operator()(It prev, It first, It last)
-	{
-		instance_first = prev;
-		return do_solve(prev, first, last);
-	}
-
-    ~solve () {
-        for (size_t i=1; i < N; ++i)
-            delete[] memoize[i];
-        delete[] memoize;
-    }
-
-private:
-	uint64_t do_solve(It prev, It first, It last)
-	{
-		uint64_t res = 0ULL;
-		if (0 == distance(first,last)) return *prev;
-
-		size_t row = distance(instance_first, prev);
-		size_t col = distance(instance_first, first);
-
-		if (memoize[row][col] != numeric_limits<uint64_t>::max()) 
-			res = memoize[row][col];
-		else if (*prev >= *first) {
-
-			res = do_solve(prev, ++first, last);
-			memoize[row][col] = res;
-		}
-		else { 
-			It next = first;
-			++next;
-
-			uint64_t include = *prev + do_solve(first, next, last);
-			uint64_t exclude = do_solve(prev, next, last);
-
-			res =  max(include, exclude);
-			memoize[row][col] = res;
-		}
-		return res;
-	}
-
-	size_t N;
-	uint64_t **memoize;
-	It instance_first;
-};
 int main (int argc, char const * argv[])
 {
 	ifstream ifs;
@@ -76,20 +18,34 @@ int main (int argc, char const * argv[])
 		cin.rdbuf(ifs.rdbuf());
 	}
 	
+	chrono::system_clock::time_point t1 = chrono::system_clock::now();
 	size_t T;
 	cin >> T;
 	while (T--) {
 		size_t N;
 		cin >> N;
-		uint32_t a[N+1];
-		a[0] = 0;
+		uint32_t a[N];
 		for (size_t i = 1; i<N+1; ++i) cin >> a[i];
 		
-		chrono::system_clock::time_point t1 = chrono::system_clock::now();
-		solve<uint32_t*> s(N+1);
-		cout << "Time: " << (chrono::system_clock::now() - t1).count() << endl;
-		cout << s(a, a+1, a+N+1) << endl;
+		uint32_t ans[N];
+		fill(ans,ans+N,0);
+		ans[0] = a[0];
+		for (size_t i=1; i<N; ++i) {
+			uint32_t maxx = 0;
+			for (size_t j=0;j<i; ++j) {
+				if (a[j] < a[i] && ans[j] > maxx)
+					maxx = ans[j];
+
+			}
+			ans[i] = a[i] + maxx;
+		}
+			
+		uint32_t maxx = ans[0];
+		for (size_t i=1; i<N; ++i)
+			if (ans[i] > maxx) maxx = ans[i];
+		cout << maxx << endl;
 	}
+	cout << "Time: " << (chrono::system_clock::now() - t1).count() << endl;
 	return 0;
 
 }
