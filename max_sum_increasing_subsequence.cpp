@@ -16,10 +16,10 @@ class solve
 public:
 	solve(size_t _N): N(_N) 
 	{ 
-		memoize = new uint64_t*[N-1];
-		for (size_t i = 0; i < N-1; ++i) { 
-			memoize[i] = new uint64_t[N];
-			fill(memoize[i], memoize[i]+N, numeric_limits<uint64_t>::max());
+		memoize = new uint64_t*[N];
+		for (size_t i = 0; i < N; ++i) { 
+			memoize[i] = new uint64_t[N+1];
+			fill(memoize[i], memoize[i]+N+1, numeric_limits<uint64_t>::max());
 		}
 	}
 
@@ -29,6 +29,11 @@ public:
 		return do_solve(prev, first, last);
 	}
 
+    ~solve () {
+        for (size_t i=1; i < N; ++i)
+            delete[] memoize[i];
+        delete[] memoize;
+    }
 
 private:
 	uint64_t do_solve(It prev, It first, It last)
@@ -41,7 +46,7 @@ private:
 
 		if (memoize[row][col] != numeric_limits<uint64_t>::max()) 
 			res = memoize[row][col];
-		else if (*prev > *first) {
+		else if (*prev >= *first) {
 
 			res = do_solve(prev, ++first, last);
 			memoize[row][col] = res;
@@ -80,7 +85,9 @@ int main (int argc, char const * argv[])
 		a[0] = 0;
 		for (size_t i = 1; i<N+1; ++i) cin >> a[i];
 		
+		chrono::system_clock::time_point t1 = chrono::system_clock::now();
 		solve<uint32_t*> s(N+1);
+		cout << "Time: " << (chrono::system_clock::now() - t1).count() << endl;
 		cout << s(a, a+1, a+N+1) << endl;
 	}
 	return 0;
@@ -131,4 +138,8 @@ int main (int argc, char const * argv[])
 //  Its Correct output is:
 //  6974
 
+//
+//	94
+//	726 32 493 143 223 287 65 901 188 361 414 975 271 171 236 834 712 761 897 668 286 551 141 695 696 625 20 126 577 695 659 303 372 467 679 594 852 485 19 465 120 153 801 88 61 927 11 758 171 316 577 228 44 759 165 110 883 87 566 488 578 475 626 628 630 929 424 521 903 963 124 597 738 262 196 526 265 261 203 117 31 327 12 772 412 548 154 521 791 925 189 764 941 852
+//	
 
