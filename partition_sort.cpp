@@ -11,18 +11,13 @@ template <typename It>
 It partition(const It first,const It last)
 {
 	It left=first+1, right=last-1, mid=first;
-	std::advance(mid, std::distance(first, last)/2);
-	typename It::value_type pivot = *mid;
-	std::swap(*first, *mid);
 
 	while (left <= right)
 	{
-		while(left <= right && *left <= pivot) ++left;
-		while(left <= right && *right > pivot) --right;
+		while(left <= right && *left <= *mid) ++left;
+		while(left <= right && *right > *mid) --right;
 
 		if (left < right) std::swap(*left, *right);
-
-
 	}
 	--left;
 	std::swap(*left, *first);
@@ -52,7 +47,7 @@ int main(int argc, const char * const argv[])
 	std::vector<std::string> v;
 	std::copy(std::istream_iterator<std::string>(std::cin),std::istream_iterator<std::string>(), std::back_inserter(v));
 	quicksort(v.begin(), v.end());
-	for (std::string s: v) std::cout << s;
+	for (std::string s: v) std::cout << s << " ";
 	std::cout << std::endl;
 	return 0;
 }
