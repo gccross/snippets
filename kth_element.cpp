@@ -2,34 +2,60 @@
 #include <iostream>
 #include <iterator>
 #include <vector>
-using namespace std;
+#include <utility>
+
+namespace george {
 
 template <typename It>
-It get_max(It first, It last)
+It partition(It first, It last)
 {
-    It max = first;
-    while (++first != last)
-    {
-        max = (*first > *max) ? first : max;
-    }
-    return max;
+	It left = first+1, right = last - 1;
+	It pivot = first;
+	while (left <= right)
+	{
+		while (left <= right && *left <= *pivot) ++left;
+		while (left <= right && *right > *pivot) --right;
+
+		if (left < right) std::swap (*left, *right);
+
+	}
+	--left;
+	std::swap (*pivot, *left);
+	return left;
 }
+
+template <typename It>
+void nth_element(It first, It nth, It last)
+{
+	if (first >= last) return;
+	It mid = partition(first, last);
+
+	if (mid == nth)
+		return;
+
+	if (mid <= nth)
+		george::nth_element(mid+1, nth, last);
+	else 
+		george::nth_element(first, nth, mid);
+	
+	
+}
+
+} // namespace 
+
 int main() {
 	//code
 	size_t T;
-	cin >> T;
+	std::cin >> T;
 	while (T--) {
 	    size_t N, K;
-	    cin >> N;
-	    vector<uint16_t> v;
-	    copy_n(istream_iterator<uint16_t>(cin), N, back_inserter(v));
-	    cin >> K;
-	    vector<uint16_t>::iterator max = get_max(v.begin(), v.begin() + K);
-	    for (vector<uint16_t>::iterator it=v.begin()+K; it!=v.end(); ++it){
-	        if (*it < *max) *max = *it;
-	        max = get_max(v.begin(), v.begin() + K);
-	    }
-	    cout << *max  << endl;
+	    std::cin >> N;
+	    std::vector<uint16_t> v;
+	    std::copy_n(std::istream_iterator<uint16_t>(std::cin), N, std::back_inserter(v));
+	    std::cin >> K;
+		george::nth_element(v.begin(), v.begin() + K - 1, v.end());
+	    std::cout << *(v.begin() +K -1)  << std::endl;
 	}
 	return 0;
 }
+
