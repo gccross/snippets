@@ -1,64 +1,9 @@
 #include <algorithm>
-#include <iostream>
+#include <functional>
 #include <iterator>
-#include <vector>
+#include <iostream>
+#include <queue>
 #include <utility>
-
-namespace george {
-
-template <typename It>
-It partition_hoare(It first, It last)
-{
-	It left = first+1, right = last - 1;
-	It pivot = first;
-	while (left <= right)
-	{
-		while (left <= right && *left <= *pivot) ++left;
-		while (left <= right && *right > *pivot) --right;
-
-		if (left < right) std::swap (*left, *right);
-
-	}
-	--left;
-	std::swap (*pivot, *left);
-	return left;
-}
-
-template <typename It>
-It partition_lomuto(It first, It last)
-{
-	It left = first, right = last - 1;
-	It pivot = right;
-	It selectcount = first;
-	while (left < right)
-	{
-		if (*left < *pivot)
-			std::swap (*left, *selectcount++);
-
-		++left;
-	}
-	std::swap (*pivot, *selectcount);
-	return selectcount;
-}
-
-template <typename It>
-void nth_element(It first, It nth, It last, It (*partition_function)(It, It))
-{
-	if (first >= last) return;
-	It mid = partition_function(first, last);
-
-	if (mid == nth)
-		return;
-
-	if (mid <= nth)
-		george::nth_element(mid+1, nth, last, partition_function);
-	else 
-		george::nth_element(first, nth, mid, partition_function);
-	
-	
-}
-
-} // namespace 
 
 int main() {
 	//code
@@ -69,10 +14,14 @@ int main() {
 	    std::cin >> N;
 	    std::vector<uint32_t> v;
 	    std::copy_n(std::istream_iterator<uint32_t>(std::cin), N, std::back_inserter(v));
-	    std::cin >> K;
 		std::chrono::time_point<std::chrono::system_clock> t1 = std::chrono::system_clock::now();
-		george::nth_element(v.begin(), v.begin() + K - 1, v.end(), george::partition_lomuto);
-	    std::cout << *(v.begin() +K -1)  << std::endl;
+		std::make_heap(v.begin(), v.end(), std::greater<uint32_t>());
+	    std::cin >> K;
+		while (1 != K--) {
+			std::pop_heap(v.begin(), v.end(), std::greater<uint32_t>());	
+			v.pop_back();
+		}
+		std::cout <<  v.front() << std::endl;
 		std::cout <<  "Duration: " << (std::chrono::system_clock::now() - t1).count() << std::endl;
 	}
 	return 0;
