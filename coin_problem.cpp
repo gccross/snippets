@@ -1,3 +1,39 @@
+#include<iostream>
+#include<algorithm>
+#include<climits>
+
+
+using namespace std;
+
+
+int main(){
+	int t;
+	cin >> t;
+	while(t--){
+		int v, n;
+		cin >> v >> n;
+
+		int coin[n];
+
+		for(int i = 0; i < n; i++) cin >> coin[i];
+
+		int dp[v+1];
+
+		for(int k = 0; k < v+1; k++) dp[k] = {INT_MAX};
+		dp[0] = 0;
+
+		for(int i = 0; i < n; i++){
+			for(int j = coin[i]; j < v+1; j++){
+				if(dp[j-coin[i]] != INT_MAX && dp[j] > dp[j-coin[i]]+1) 
+					dp[j] = dp[j-coin[i]] + 1;
+			}
+		}
+
+		if(dp[v] == INT_MAX) cout << -1 << endl;
+		else cout << dp[v] << endl;
+	}
+	return 0;
+}
 //	Given a value V. You have to make change for V cents, given that you have infinite supply of each of 
 //	C{ C1, C2, .. , Cm} valued coins.  	Find the minimum number of coins to make the change.
 //	
@@ -48,39 +84,3 @@
 //	And Your Code's output is:
 //	102
 //	
-#include<iostream>
-#include<algorithm>
-#include<climits>
-
-
-using namespace std;
-
-
-int main(){
-	int t;
-	cin >> t;
-	while(t--){
-		int v, n;
-		cin >> v >> n;
-
-		int coin[n];
-
-		for(int i = 0; i < n; i++) cin >> coin[i];
-
-		int dp[v+1];
-
-		for(int k = 0; k < v+1; k++) dp[k] = {INT_MAX};
-		dp[0] = 0;
-
-		for(int i = 0; i < n; i++){
-			for(int j = coin[i]; j < v+1; j++){
-				if(dp[j-coin[i]] != INT_MAX && dp[j] > dp[j-coin[i]]+1) 
-					dp[j] = dp[j-coin[i]] + 1;
-			}
-		}
-
-		if(dp[v] == INT_MAX) cout << -1 << endl;
-		else cout << dp[v] << endl;
-	}
-	return 0;
-}
