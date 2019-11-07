@@ -1,11 +1,11 @@
-
+#include <bits/stdc++.h>
 
 using namespace std;
 
 vector<string> split_string(string);
 
 /*
- * From Hacker Rank.   Complete the similarStrings function below.
+ * Complete the similarStrings function below.
  */
 vector<int> similarStrings(int n, string S, vector<vector<int>> queries) {
 
@@ -31,15 +31,15 @@ vector<int> similarStrings(int n, string S, vector<vector<int>> queries) {
         return true;
     };
 
-
-    auto build_memoize_table = [](vit first, vit last) {
-        auto factorial = [](int N) { 
+    auto factorial = [](int N) { 
             int res = 0, i=N;
             while (i--) res += N-i;
             return res;
-        };
+    };
 
-        vector<bool> dp(factorial(distance(first, last) - 1));
+
+    auto build_memoize_table = [factorial](vit first, vit last) {
+         vector<bool> dp(factorial(distance(first, last) - 1));
         fill(dp.begin(), dp.end(), false);
         int k=0;
         for (vit i = first; i < last - 1; ++i) 
@@ -49,16 +49,40 @@ vector<int> similarStrings(int n, string S, vector<vector<int>> queries) {
         return dp;
     };
 
+    auto vectorize = [factorial](int i, int j, int N){
+        int res = i * N + j - factorial(i+1);
+        return res;
+    };
+
+    vector<bool> dp = build_memoize_table(S.begin(), S.end());
+
     vector<int> res_vec;
     for (vector<vector<int>>::iterator it=queries.begin(); it<queries.end(); ++it) {
         int left = (*it)[0]-1, right = (*it)[1]; // conv 1..n to C++ iterator paradigm
         int sub_len = right - left;
  
-        vector<bool> dp = build_memoize_table(S.begin()+left, S.begin() + left + sub_len);
+        vector<int> base_indicies;
+        for (int i = left; i< right - 1; ++i) 
+            for (int j=i+1; j < right; ++j) 
+                base_indicies.emplace_back(vectorize(i,j,n));
+        
         int res = 0;
-        for (vit h=S.begin(); h + sub_len - 1 < S.end() ; ++h){
-            vector<bool> dp2 = build_memoize_table(h, h+sub_len);
-            if (dp == dp2) ++res;
+        for (vit h=S.begin(); h + sub_len - 1 < S.end(); ++h){
+            bool match = true;
+            int base_index = 0;
+            cout << string(h, h+sub_len) << ":" << endl;
+            for (vit i = h; i < h + sub_len - 1; ++i)
+                for (vit j = i+1; j < h + sub_len; ++j) {
+                    if ((*i == *j) && !dp[base_indicies[base_index]]
+                        ||
+                        (*i != *j) && dp[base_indicies[base_index]]){
+                        match = false;
+                        break;
+                    }
+                    ++base_index;
+                }
+
+            if (match) ++res;
         }
         res_vec.emplace_back(res);          
     }
