@@ -1,10 +1,8 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <limits>
 #include <sstream>
 #include <string>
-#include <vector>
-#include <memory>
 
 using namespace std;
 
@@ -26,13 +24,9 @@ int main(int argc, char const * const * argv)
 	while (getline(*is,line))
 	{
 		linecount ++;
-		charcount += line.size();
-		istringstream iss(line.data());
-		while (iss >> word) 
-		{
-			wordcount++;
-			word.clear();
-		}
+		charcount += line.size() + 1;
+		istringstream stream(line);
+		wordcount += distance(istream_iterator<string>(stream), istream_iterator<string>());
 		line.clear();
 	}
 		
