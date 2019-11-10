@@ -1,58 +1,42 @@
 #include <algorithm>
 #include <iostream>
-#include <limits>
-#include <map>
-#include <utility>
 #include <vector>
 
 using namespace std;
 
-class Solution {
+pair<int,int> min_points(const vector<vector<int>>& v, size_t R, size_t C)
+{
+	int init{0}, subtotal{0};
 
-	int C;
-	int shortest_path; 
-	vector<int> path;
-
-public:
-	Solution(int cols): C(cols), shortest_path( numeric_limits<int>::max()) {};
-	int count_paths(int const * m, size_t const row, size_t const col)
-	{
-		int subtotal=0, max_negative_subtotal = 0;
-		if (0 == row || 0 == col) {
-
-			// add up the row or col, recording the most negative value
-			if (0 == row) 
-					for (size_t c=0; c<=col; ++c) {
-						subtotal += m[c];
-						max_negative_subtotal = min(subtotal, max_negative_subtotal);
-					}
-			else // 0 == col
-					for (int r = 0; r<=row*C; r+=C)
-					{
-						subtotal += m[r];
-						max_negative_subtotal = min(subtotal, max_negative_subtotal);
-					}
-
-			// now add up the rest of the path, recording the most negative value
-			// go backward through the vector, since we need to go forward through the path
-			for (vector<int>::reverse_iterator it = path.rbegin();  it!=path.rend(); ++it){
-				subtotal += *it;
-				max_negative_subtotal = min(subtotal, max_negative_subtotal);
+	if (R == 1 || C == 1) {
+		if (R == 1)
+			for (size_t i=0; i<C; ++i) {
+				subtotal += v[0][i];
+				if (init + subtotal < 1) init += 1 - (init + subtotal);
 			}
-
-			shortest_path = min(max_negative_subtotal*-1 +1, shortest_path);
-
-		} else {
-			// continue up the path
-			path.push_back(m[row*C + col]);
-			count_paths(m, row-1, col); 
-			count_paths(m, row, col-1);
-			path.pop_back();
-		}
-
-		return shortest_path;
+		else // C == 1
+			for (size_t i=0; i<R; ++i) {
+				subtotal += v[i][0];
+				if (init + subtotal < 1) init += 1 - (init + subtotal);
+			}
+		return make_pair(init, subtotal);
 	}
-};
+
+	const pair<int,int> val_left =  min_points(v, R, C-1);
+	const pair<int,int> val_up =  min_points(v, R-1, C);
+
+	int init_left = val_left.first;
+	int init_up = val_up.first;
+	int subtotal_left = v[R-1][C-1] + val_left.second;
+	int subtotal_up = v[R-1][C-1] + val_up.second;
+
+	if (init_left + subtotal_left < 1) init_left += 1 - (init_left + subtotal_left);
+	if (init_up + subtotal_up < 1) init_up += 1 - (init_up + subtotal_up);
+
+	if (init_left < init_up)
+		return make_pair(init_left, subtotal_left);
+	return make_pair(init_up, subtotal_up);
+}
 
 int main(const int argc, const char * const argv[])
 {
@@ -64,16 +48,15 @@ int main(const int argc, const char * const argv[])
 		cin >> R;
 		cin >> C;
 
-		Solution s(C);
-		int m[R*C];
-		for (int r=0; r<R; ++r)
-			for (int c=0; c<C; ++c)
-				cin >> m[r*C+c];
+		vector<vector<int>> m(R, vector<int>(C));
+		for (size_t r=0; r<R; ++r)
+			for (size_t c=0; c<C; ++c)
+				cin >> m[r][c];
 
 		// easy check
-		for (int r=0; r<R; ++r) {
-			for (int c=0; c<C; ++c) {
-				cout << m[r*C+c] << "\t";
+		for (size_t r=0; r<R; ++r) {
+			for (size_t c=0; c<C; ++c) {
+				cout << m[r][c] << "\t";
 			}
 			cout << endl;
 		}
@@ -83,7 +66,7 @@ int main(const int argc, const char * const argv[])
 		// 		while keeping a telltale of greatest negative subtotal
 		//	value of path is (greatest negative subtotal) * -1 +1;
 
-		cout << s.count_paths(m, R-1, C-1) << endl;
+		cout << min_points(m, R, C).first << endl;
 	} 
 	return 0 ;
 }
@@ -147,4 +130,10 @@ int main(const int argc, const char * const argv[])
 // 7
 // 31
 // 
-
+/*
+ 2
+ 3 3
+ -2 -3 3 -5 -10 1 10 30 -5
+ 8 7
+-30 -5 29 1 18 30 6 20 -15 -21 -12 -20 -21 -21 9 -4 17 -22 -14 -18 3 -9 -1 -14 14 -2 -17 -5 -20 6 19 -19 -3 -30 -1 19 -30 12 -12 16 25 16 17 -18 14 3 -18 6 19 -13 27 -15 0 -11 1 9
+*/
