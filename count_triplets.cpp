@@ -73,4 +73,3 @@ int main(int argc, char const * const argv[]) {
 //Explanation:
 //Testcase 1: There are 2 triplets: 1 + 2 = 3 and 3 +2 = 5
 //
-//
