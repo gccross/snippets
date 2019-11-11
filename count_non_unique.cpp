@@ -1,6 +1,7 @@
 #include <algorithm> 
 #include <iostream>
 #include <fstream>
+#include <unordered_set>
 
 using namespace std;
 
@@ -8,19 +9,13 @@ using namespace std;
 template <typename It>
 int count_unique(It first, It last)
 {
-	sort(first, last);
-	It it = adjacent_find(first, last);
+	unordered_set<typename It::value_type> uos;
 	size_t count {0};
-	while (it != last) {
-		typename It::value_type val = *it;
-		count += distance(first, it);
-		while (it!= last && val == *it) ++it;
-		first = it;
-		it = adjacent_find(first, last);
-	}
-	count += distance(first, it);
+	while (first < last)
+		if (uos.insert(*first++).second) ++count;
+		
+		
 	return count;
-	
 }
 
 int main (int argc, char const * const  argv[])
