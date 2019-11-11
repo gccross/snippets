@@ -34,3 +34,6 @@ int main() {
 	}
 	return 0;
 }
+
+// G4G question: a sequence of consecutive ints starting at 1, one of the consecutive sequence is skipped.  Which one is it?
+// N = last number in sequence.  N-1 is the count of ints in the sequence.
