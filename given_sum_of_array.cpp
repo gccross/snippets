@@ -28,6 +28,5 @@ int main() {
 		if (sum != S) cout << -1 << endl;
 
 	}
-	//code
 	return 0;
 }
