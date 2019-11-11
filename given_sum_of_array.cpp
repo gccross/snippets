@@ -10,19 +10,19 @@ int main() {
 		int N, S;
 		cin >> N >> S;
 		uint32_t a[N];
-		copy_n(istream_iterator<uint32_t>(cin), N, a);
 		uint32_t sum{0};
-		int i=0, j=0;
+		int i=0, left = 0, right=0;
 		
-		while (j<=N) {
-			while (sum < S) sum+=a[j++];
-		
+		while (i < N) {
+			cin >> a[i];
+			sum += a[i];
+			while (sum > S) sum -= a[left++];
+
 			if (sum == S) {
-				cout << i+1 << " " << j << endl;
+				cout << left+1 << " " << i+1 << endl;
 				break;
 			}
-
-			while (sum > S) sum -= a[i++];
+			++i;
 		}
 
 		if (sum != S) cout << -1 << endl;
