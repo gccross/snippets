@@ -19,13 +19,15 @@ int main(int argc, char const * const argv[]) {
     while (T--) {
         size_t N;
         cin >> N;
-        unsigned int a[N];
+        unsigned a[N];
         
-        uint64_t bits[4]; // largest sum can't be > 209 (104+105)
-		fill(bits, bits+4, 0UL);
+		unsigned bitmask_size = pow(10,6)/64;
+        uint64_t bits[bitmask_size]; 
+		fill(bits, bits+bitmask_size, 0UL);
         size_t i{N};
         while (i--) {
             cin >> a[i];
+			
             uint64_t mask = 1UL << (a[i] - 1); // don't forget UL on the constant.  Otherwise, you wrap at 32 bits.
             unsigned section = get_bitfield_section(a[i]);
             bits[section] |= mask;
@@ -36,13 +38,12 @@ int main(int argc, char const * const argv[]) {
             for (unsigned j=i+1; j<N; ++j) {
                 
                 uint64_t sum = a[i]+a[j];
-                if (sum > 104+105) continue; // according to problem description
+                if (sum > pow(10,6)) continue; // according to problem description
                 
 				uint64_t mask = 1UL << (sum - 1);
                 unsigned section = get_bitfield_section(sum);
 				
-				bool res = mask & bits[section];
-                if (res) ++count;
+                if (mask & bits[section]) ++count;
             }
         }
         cout << (count == 0 ? -1 : count) << endl;
