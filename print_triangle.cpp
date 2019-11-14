@@ -13,9 +13,8 @@ int main(int argc, const char * const argv[])
 	fill(a,a+N, '#');
 	cout.setf(ios_base::right);
 	int i=N;
-	while (i--) {
+	while (i--)
 		cout << setw(N) << string(a, a+N-i) << endl;
-	}
 
 	return 0;
 
