@@ -7,6 +7,7 @@ int main(int argc, char const * const argv[]) {
 	int T;
 	cin >> T;
 	while (T--){
+		chrono::time_point<chrono::system_clock> t1 { chrono::system_clock::now()};
 		int N; 
 		cin >> N;
 		int a[N];
@@ -21,7 +22,11 @@ int main(int argc, char const * const argv[]) {
 					count = ans[j];
 			ans[i] = count+1;
 		}
-		cout << ans[N-1] << endl;
+		int maxx = 0;
+		for_each(ans, ans+N, [&maxx](int i){ if (maxx < i) maxx = i; });
+		cout << maxx << endl;;
+
+		cout <<  (chrono::system_clock::now() - t1).count() << endl;
 	}
 	return 0;
 }
