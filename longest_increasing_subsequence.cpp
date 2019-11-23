@@ -1,5 +1,6 @@
+#include <algorithm>
 #include <iostream>
-#include <string>
+#include <vector>
 using namespace std;
 
 int main(int argc, char const * const argv[]) {
@@ -12,29 +13,32 @@ int main(int argc, char const * const argv[]) {
 		cin >> N;
 		int a[N];
 		copy_n(istream_iterator<int>(cin), N, a);
-		int ans[N+1];
-		fill(ans, ans+N+1, -1);
-		ans[0] = 1;
+		vector<int> ans;
+		ans.emplace_back(a[0]);
 		for (int i=1; i<N; ++i) {
-			int count = 0;
-			for (int j=0; j<i; ++j) 
-				if (a[j] < a[i] && count < ans[j])
-					count = ans[j];
-			ans[i] = count+1;
+			if (a[i] > *(ans.end()-1))
+				ans.emplace_back(a[i]);
+			else {
+				vector<int>::iterator it = lower_bound(ans.begin(), ans.end(), a[i]);
+				*it = a[i];
+			}
 		}
-		int maxx = 0;
-		for_each(ans, ans+N, [&maxx](int i){ if (maxx < i) maxx = i; });
-		cout << maxx << endl;;
-
+		cout << ans.size() << endl;;
 		cout <<  (chrono::system_clock::now() - t1).count() << endl;
 	}
 	return 0;
 }
 
 /*
-1
+2
 9
 15 27 14 38 26 55 46 65 85
+9
+2 6 3 4 1 2 9 5 8
 
-Output: 6
+Output: 
+6
+5
+
+
 */
