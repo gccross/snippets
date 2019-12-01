@@ -7,7 +7,7 @@ template <typename It>
 int find_missing(It first, It last)
 {
 	int len = distance(first,last);
-	if (1 == len) return *first + 1;
+	if (1 == len) return *first == 2 ? 1 : *first + 1;
 
 	It mid = first + len / 2;
 	if (*mid  - *first != len/2)
@@ -28,9 +28,7 @@ int main() {
 		--N;
 		int a[N];
 		copy_n(istream_iterator<int>(cin), N, a);
-		sort(a, a+N);
-		int missing = *a == 2 ? 1 : find_missing(a, a+N);
-		cout <<  missing << endl;
+		cout <<  find_missing(a, a+N) << endl;
 	}
 	return 0;
 }
