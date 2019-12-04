@@ -1,21 +1,75 @@
+// Given a string, print the first non-duplicate character (going left to right).
+// eg. bloomberg
+//
+// l
+//
+// Explanation: l is the first character of the word that has only 1 occurrance 
+//
+// Possible solutions: 
+//
+// 1. call string::find for each character O(n).  Print the first value for which find returns npos;
+// 2. insert all characters into a hashmap (unordered_map) and set the value to the count.  Print 
+//    the first element in the map for which 
+// 
+
 #include <algorithm> 
 #include <iostream>
 #include <fstream>
 #include <unordered_set>
+#include <string>
+#include <vector>
 
 using namespace std;
 
+struct vector_method_tag{};
+struct hashset_method_tag {};
+struct find_method_tag {};
 
 template <typename It>
-int count_unique(It first, It last)
+typename It::value_type print_first_unique_in_vector(It first, It last)
 {
-	unordered_set<typename It::value_type> uos;
-	size_t count {0};
-	while (first < last)
-		if (uos.insert(*first++).second) ++count;
-		
-		
-	return count;
+	It left {first};
+	while (left < last) {
+		if (count(first,last, *left) == 1) return *left;
+		++left;
+	}
+	return '\0';
+}
+
+template <typename It, typename M >
+typename It::value_type print_first_unique_in_vector(It first, It last, M);
+template <>
+char print_first_unique_in_vector(string::iterator first, string::iterator last, vector_method_tag)
+{
+	string::iterator left{first};
+	vector<size_t> count(52);  // bad: assumes only A-Za-z
+	while (left < last) 
+		++count[*left++ -'A'];
+
+	left = first;
+	while (left < last) {
+		if (count[*left - 'A'] == 1) break;
+		++left;
+	}
+	return left == last ? '\0' : *left;
+}
+
+template <>
+char print_first_unique_in_vector(string::iterator first, string::iterator last, hashset_method_tag)
+{
+	unordered_set<char> uos;
+	string duplicates;
+	string::iterator left{first};
+
+	while (left < last) {
+		if (!uos.insert(*left).second) duplicates.push_back(*left);
+		++left;
+	}
+
+	left = first;
+	while (find(duplicates.begin(), duplicates.end(), *left) != duplicates.end()) ++left;
+
+	return left == duplicates.end() ? '\0' : *left;
 }
 
 int main (int argc, char const * const  argv[])
@@ -28,7 +82,9 @@ int main (int argc, char const * const  argv[])
 	
 	string line;
 	while (getline(cin, line)) {
-		cout << count_unique(line.begin(), line.end()) << endl;	 
+		cout << print_first_unique_in_vector(line.begin(), line.end(), hashset_method_tag()) << endl;	 
+		cout << print_first_unique_in_vector(line.begin(), line.end(), vector_method_tag()) << endl;	 
+		cout << print_first_unique_in_vector(line.begin(), line.end() ) << endl;	 
 	}
 	return 0;
 
