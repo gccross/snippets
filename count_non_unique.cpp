@@ -7,9 +7,12 @@
 //
 // Possible solutions: 
 //
-// 1. call string::find for each character O(n).  Print the first value for which find returns npos;
-// 2. insert all characters into a hashmap (unordered_map) and set the value to the count.  Print 
-//    the first element in the map for which 
+// 1. call string::find for each character O(n).  Print the first value for which find returns npos. Similar to the 2. option here.
+// 2. for generic types, not necessarily characters, iterate calling count.  Break on the first which has a count of 1.  O(n).
+// 3. insert each element (not necessarily characters) into a hashset (unordered_set) and if the insert fails, 
+//    record the element in a vector called 'duplicates'.  In the end check for the first element which is not a duplicate. O(2n);
+// 4. if the range of possible characters is limited, you can use a vector or array to record the count for each character as you 
+//    iterate. After that, iterate the range again, looking in the vector or array for a count of 1.
 // 
 
 #include <algorithm> 
