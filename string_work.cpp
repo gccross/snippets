@@ -2,20 +2,34 @@
 #include <string>
 using namespace std;
 
+
+template <typename It>
+It find_first_duplicated(It first, It last)
+{
+	if (first == last) return first;
+	It pred = first;
+	while (++first < last)
+	{
+		It it = first;
+		while (it != last && *it++ != *pred);
+		if (it != last) break;
+		++pred;
+	}
+	return first == last ? first : pred;
+}
 template <typename It>
 It find_first_non_duplicated(It first, It last)
 {
 	if (first == last) return first;
-	while (first < last) 
+	It pred = first;
+	while (++first < last) 
 	{
-		typename It::value_type v = *first;
 		It it = first;
-		
-		while (++it < last && *it++ != v);
+		while (it < last && *it++ != *pred);
 		if (it == last) break;
-		++first;
+		++pred;
 	}
-	return first;
+	return first == last ? first : pred;
 }
 
 template <typename It>
@@ -59,6 +73,12 @@ int main(int const argc, const char* const argv[])
 		cout << *it << endl;
 	else 
 		cout << "all duplicates" << endl;
+
+	it = find_first_duplicated(input.begin(), input.end());
+	if (it != input.end())
+		cout << *it << endl;
+	else 
+		cout << "no duplicates" << endl;
 	return 0;
 }
 
