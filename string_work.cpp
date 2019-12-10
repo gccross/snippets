@@ -48,7 +48,6 @@ template <typename It>
 It remove_adjacent_duplicate(It first, It last, typename It::value_type v)
 {
 	if (first == last) return first;
-	bool found = false ;
 	It prev = first;
 	while (++first < last)
 	{
