@@ -18,9 +18,10 @@ size_t merge(It first, It mid, It last)
     {
         if (*first > *mid)
         {
-            while (first != mid) {
-            	count+= distance(first,mid);
-				iter_swap(first++, mid);
+			It left = first;
+            while (left != mid) {
+            	count+= distance(left,mid);
+				iter_swap(left++, mid);
 			}
 			++mid;
         }
