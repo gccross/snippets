@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <deque>
 #include <iostream>
 #include <iterator>
 #include <forward_list>
@@ -10,25 +11,112 @@ using namespace std;
 vector<string> split_string(string);
 
 template <typename It>
-int merge(It first, It mid, It last)
+size_t merge(It first, It mid, It last)
 {
-    int count = 0;
+    size_t count = 0;
     while (first != mid && mid != last)
     {
         if (*first > *mid)
         {
-            count+= distance(first,mid);
-            iter_swap(first, mid++);
+            while (first != mid) {
+            	count+= distance(first,mid);
+				iter_swap(first++, mid);
+			}
+			++mid;
         }
-        ++first;
+        else ++first;
     }
     return count;
 }
 
-template <typename It>
-int mergesort(It first, It last)
+namespace rama_hoetzlein
 {
-    int count = 0;
+template <typename It>
+size_t mergesort(It first, It last)
+{
+	size_t n = distance(first, last);
+	size_t count = 0;
+
+	for (size_t incr = 1; incr < n; incr *= 2)
+		for (size_t left = 0; left + incr < n; left += incr*2)
+		{
+			size_t right = left + incr;
+			size_t right_end = right + incr;
+			if (right_end > n) right_end = n;
+
+			It it_l = first, it_mid = first, it_r = first;
+			advance(it_l, left);
+			advance(it_mid, right);
+			advance(it_r, right_end);
+			count += merge(it_l, it_mid, it_r);
+		}
+	return count;	
+}
+}
+
+namespace george_bfs
+{
+template <typename It>
+size_t mergesort(It first, It last)
+{
+	size_t n = distance(first,last);
+	if (n < 4)
+	{
+		It mid = first;
+		++mid;
+		return merge(first, mid, last);
+	}
+	
+	deque<pair<It, It>> dq;
+	for (int incr = n/2; incr > 1; incr/=2)
+	{
+		It left = first;
+		size_t len = 0;
+
+		while (len < n)
+		{
+			It right = left;
+			advance(right, incr);
+			dq.push_front(make_pair(left, right));
+			left = right;
+			len += incr;
+			if (n - len < 2*incr)
+			{
+				dq.push_front(make_pair(left, last));
+				len = n;
+			}
+		}
+	}
+
+	// sort the leaves
+	size_t inv_count = 0;
+	typename deque<pair<It, It>>::iterator it = dq.begin(); 
+	do
+	{
+		It mid = it->first;
+		++mid;
+		inv_count += merge(it->first, mid, it->second);
+		++it;
+	} while (it->second != last);
+
+	
+	// merge the rest
+	while (!dq.empty())
+	{
+		pair<It, It> right = dq.front(); dq.pop_front();
+		pair<It, It> left = dq.front(); dq.pop_front();
+		
+		inv_count += merge(left.first, left.second, right.second);
+	}
+	return inv_count;
+}
+} 
+
+
+template <typename It>
+size_t mergesort(It first, It last)
+{
+    size_t count = 0;
     if (first == last) return 0;
 	It mid = first;
 	++mid;	
@@ -46,7 +134,7 @@ int mergesort(It first, It last)
 template <typename It>
 void minimumBribes(It first, It last) {
 
-    cout << endl << mergesort(first, last) << endl;
+    cout << endl << rama_hoetzlein::mergesort(first, last) << endl;
     copy(first, last, ostream_iterator<int>(cout, " "));
     cout << endl;
 }
