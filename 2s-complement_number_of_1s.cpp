@@ -14,5 +14,17 @@ int main(const int argc, const char * const argv[])
 	z-= 1;
 	
 	cout << q << "\t" << (y&z) << "\t" << z << "\t" << c << endl;
+
+	// twos complement
+	string s;
+	cout << "Hello World " __FILE__ << endl;
+	cout << "Enter something... " << endl;
+	while (getline(cin,s))
+	{
+		int x = atoi(s.c_str());
+		cout << "Using xor (^): " << (x ^ -1) + 1 << endl; 
+		cout << "Using not (~): " << ~x  + 1 << endl; 
+	}
+		
 	return 0;
 }
