@@ -16,7 +16,7 @@ class Solution {
 				if (range){
 					if (flowerbed.begin() != curr) --range	;
 					if (flowerbed.end() != next) --range ;
-					n -= range%2? (range+1)/2 : range/2;
+					n -= range/2 + range%2; 
 					if (n <= 0 ) return true;
 				}
 				curr = find(next, flowerbed.end(), 0);
