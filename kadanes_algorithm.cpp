@@ -21,7 +21,6 @@ int main (int argc, char const * argv[])
 		{
 			submax = max(a[i], submax+a[i]);
 			maxx = max(submax, maxx);
-
 		}
 
 		cout << maxx << endl;
