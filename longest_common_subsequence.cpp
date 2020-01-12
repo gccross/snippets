@@ -18,19 +18,23 @@ int main(const int argc, const char * const argv[]) {
 			int rows = m+1, cols = n+1;
             vector<int> dp = vector<int>(rows * cols, 0);
             
-            for (int i = 1; i < rows; ++i)
-                for (int j = 1; j < cols; ++j)
-                {
-                    if (left[i-1] == right[j-1])
-                        dp[i*cols + j] = dp[(i-1)*cols + j-1] + 1;
-                    else
-                        dp[i*cols + j] = max(dp[i*cols + j - 1], dp[(i-1)*cols + j]);
-                    cout << "left: " << left[i-1] << " right: " << right[j-1] << " " << "dp[" << i*cols+j << "] = " << dp[i*cols+j] << endl;
-                }
+			int i;
+            for (int k = cols+1; k < rows*cols; ++k)
+			{
+				i = k/cols; //note: integer div
+				int j = k - i*cols; 
+				if (j == 0) { ++j; ++k; } 
+
+				if (left[i-1] == right[j-1])
+					dp[k] = dp[k - cols - 1] + 1;
+				else
+					dp[k] = max(dp[k - cols], dp[k - 1]);
+
+				//cout << "k: " << k << " dp[k]: " << dp[k] << " i: " << i << " j: " << j << " left: " << left[i-1] << " right: " << right[j-1] << endl;
+			}
                 
             cout <<  dp[rows*cols-1] << endl;
-
-    }//code
+    }
 	return 0;
 }
 
