@@ -5,24 +5,6 @@
 
 using namespace std;
 
-/*
-template <typename T>
-struct column_iterator : public iterator<forward_iterator_tag, vector<T>>
-{
-	pointer p;
-	iterator(pointer _p): p(_p) {};
-	iterator& operator++()
-	{
-		++p;
-		return *this;
-	}
-	reference operator*()
-	{
-		return *p;
-	}
-};
-*/
-
 int main(int const argc, const char* const argv[])
 {
 	int T;
