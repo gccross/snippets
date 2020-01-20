@@ -9,9 +9,9 @@ class Car
 	string plate;
 	string brand;
 	virtual unsigned internal_getNumPassengers() const = 0;
-	protected:
+protected:
 	unsigned num_passengers;
-	public: 
+public: 
 	Car(const string& _p): plate(_p), brand(""), num_passengers(0){};
 	Car(const string& _p, const string& _b, unsigned _n): plate(_p), brand(_b), num_passengers(_n) {}
 	virtual ~Car() = default;
@@ -28,7 +28,7 @@ class SUV: public Car
 {
 	bool option;
 	unsigned internal_getNumPassengers() const { return option ? num_passengers + 3 : num_passengers; }
-	public:
+public:
 	SUV(const string& _p, const string& _b, unsigned _n, bool _o): Car(_p,_b,_n), option(_o){}
 };
 
@@ -37,7 +37,7 @@ class Sedan: public Car
 	bool option;
 	unsigned internal_getNumPassengers() const { return num_passengers; } 
 
-	public: 
+public: 
 	Sedan(const string& _p, const string& _b, unsigned _n, bool _o): Car(_p,_b,_n), option(_o){}
 };
 
@@ -45,7 +45,7 @@ class CarRental
 {
 	unordered_map<string, unique_ptr<Car>> cars;
 
-	public:
+public:
 
 	CarRental() = default;
 	void addCar(unique_ptr<Car> c) { cars[c->getPlate()] = move(c); }
