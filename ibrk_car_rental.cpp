@@ -27,7 +27,6 @@ bool operator==(const Car& lhs, const Car& rhs) { return lhs.getPlate() == rhs.g
 class SUV: public Car
 {
     bool option;
-    
     unsigned internal_getNumPassengers() const { return option ? num_passengers + 3 : num_passengers; }
     public:
         SUV(const string& _p, const string& _b, unsigned _n, bool _o): Car(_p,_b,_n), option(_o){}
@@ -52,7 +51,7 @@ class CarRental
         void addCar(unique_ptr<Car> c) { cars[c->getPlate()] = move(c); }
         void removeCar(const unique_ptr<Car> c) { cars.erase(c->getPlate());}
         size_t numCars() { return cars.size(); } 
-		unique_ptr<Car> findCar(const string& plate){ return move(cars.find(plate)->second); }
+		const Car& findCar(const string& plate){ return *(cars.find(plate)->second); }
 
 };
 
@@ -66,8 +65,8 @@ int main(const int argc, char const * const argv[])
 
 	CarRental cr;
 	cr.addCar(move(suv1));
-	unique_ptr<Car> pc = cr.findCar("abc");
-	cout << "Brand: " << pc->getBrand() << " Passengers: " << pc->getNumPassengers() << endl;
+	const Car& c = cr.findCar("abc");
+	cout << "Brand: " << c.getBrand() << " Passengers: " << c.getNumPassengers() << endl;
 
     return 0;
 }
