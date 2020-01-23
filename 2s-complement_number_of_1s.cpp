@@ -4,14 +4,15 @@ using namespace std;
 int main(const int argc, const char * const argv[])
 {
 
+
 	int x;
 	cin  >> x;
 	int c(0);
 	int y{~x}, q(x);
-	while (x>>=1) ++c;
-	int z = 1;
-	z<<=(c);
-	z-= 1;
+	while (x>>=1) ++c; // calculate home many bit places
+	int z = 1; 		
+	z<<=(c);			// get 1000 ... 00 (as many bit places as just calculated )
+	z-= 1;				// get 01111 ... 11 (as many bit places as just calclulated) 
 	
 	cout << q << "\t" << (y&z) << "\t" << z << "\t" << c << endl;
 
