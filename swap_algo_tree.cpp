@@ -48,7 +48,8 @@ vector<vector<int>> swapNodes(vector<vector<int>> _indexes, vector<int> queries)
     vector<vector<int>> res;
     for (int i=0; i < queries.size(); ++i)
     {
-        int k = queries[i];
+        int original_k = queries[i];
+	int k = original_k;
         while (k < max_height)
         {
             for (int j=1; j <= max_i ; ++j)
@@ -56,7 +57,7 @@ vector<vector<int>> swapNodes(vector<vector<int>> _indexes, vector<int> queries)
                 if (levels[j] == k) 
                     swap(indexes[j][0], indexes[j][1]);
             }
-            k += k;
+            k += original_k;
         }
         res.emplace_back(inorder_tree(indexes,1));
     }
