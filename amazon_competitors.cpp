@@ -104,26 +104,26 @@ int main (int argc, char const * argv[])
 	return 0;
 }
 /*
-Amazon wants to develop a more efficient way of evaluating their top N competitors for the latest Echo device.  For this analysis, they have developed an automated web crawler that identifies websites where users have written reviews about Amazon’s competitors.  To get a sense of the different competitors out there, they want to review these websites to see how often a competitor is mentioned: ie, a competitor is considered to be strong if its name occurs in more unique reviews.
+Amazon wants to develop a more efficient way of evaluating their top N
+competitors for the latest Echo device.  For this analysis, they have developed
+an automated web crawler that identifies websites where users have written
+reviews about Amazon’s competitors.  To get a sense of the different competitors
+out there, they want to review these websites to see how often a competitor is
+mentioned: ie, a competitor is considered to be strong if its name occurs in
+more unique reviews.
 
-Find top N competitors
-Input:
-vector<string> rankCompetitors (int numCompetitors, int numTopCompetitors, vector<string> competitors, int numReviews, vector<string> reviews
+Find top N competitors Input: vector<string> rankCompetitors (int
+numCompetitors, int numTopCompetitors, vector<string> competitors, int
+numReviews, vector<string> reviews
 
 Note: 
-* comparisons is case-insensitive
-* multiple occurrences of a competitor in a review counts as 1.
-eg: 
-Input:
+* comparisons is case-insensitive multiple occurrences of a competitor in a
+* review counts as 1.
+eg: Input:
 
-return top=2
-competitors = [newshop, shopnow, afshion, fashionbeats, mymarket, tcellular]
-reviews = [
- “tcellular rules”,
-“mymarket is the boss”,
-“asfhion is a worse effrontery to mankind than facebook”
-“mymarket for president”
-]
+return top=2 competitors = [newshop, shopnow, afshion, fashionbeats, mymarket,
+tcellular] reviews = [ “tcellular rules”, “mymarket is the boss”, “asfhion is a
+worse effrontery to mankind than facebook” “mymarket for president” ]
 
 Output:
 
