@@ -137,7 +137,7 @@ string addStrings_digit_by_digit(string s1, string s2)
 				//  999999
 				//      99
 
-				res[i] -= 10;
+				res[i] -= 10; 
 				if (res[i-1] == '.')
 					++res[i-2];
 				else
