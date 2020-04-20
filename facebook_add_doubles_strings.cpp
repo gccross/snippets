@@ -89,7 +89,7 @@ string addStrings_digit_by_digit(string s1, string s2)
 	if (!res_frac.empty())
 		res_mantissa.append(res_frac);
 
-	return res_mantissa;
+	return res_mantissa[0] == '0' ? res_mantissa.substr(1): res_mantissa;
 
 }
 
