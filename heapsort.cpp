@@ -41,6 +41,17 @@ void make_heap(T arr[], size_t n, C cmp = std::greater<T>())
 	}
 }
 
+template <typename T, typename C = std::greater<T>>
+void heap_sort(T arr[], size_t n, C cmp = std::greater<T>())
+{
+	make_heap(arr, n, cmp);
+	for (size_t i = n-1; i>0; --i)
+	{
+		swap(arr[0],arr[i]);
+		make_heap(arr,i,cmp);
+	}
+
+}
 
 int main (int argc, char const * argv[])
 {
@@ -51,6 +62,14 @@ int main (int argc, char const * argv[])
 	cout << s << endl;
 	make_heap(s.data(), s.length(), std::less<char>());
 	cout << s << endl;
+
+	string s2 = "There was a crooked man, who lived in a crooked house.";
+	heap_sort(s2.data(), s2.length());
+	cout << s2 << endl;
+	string s3 = "There was a crooked man, who lived in a crooked house.";
+	heap_sort(s3.data(), s2.length(), std::less<char>());
+	cout << s3 << endl;
+
 	return 0;
 
 }
