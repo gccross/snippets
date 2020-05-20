@@ -1,3 +1,4 @@
+#include <array>
 #include <chrono>
 #include <iostream>
 #include <pthread.h>
@@ -14,60 +15,85 @@ void* hello_and_pause(void* data)
 	return nullptr; 
 }
 
-struct thread_data 
+struct chopstick
 {
-	pthread_t thread;
-	string name;
-	unsigned spoonfuls;
-	chrono::seconds sec;
+	pthread_mutex_t mutex;
+	pthread_cond_t cond;
+	chopstick()
+	{
+		pthread_mutex_init(&mutex,nullptr);
+		pthread_cond_init(&cond,nullptr);
+	}
+	~chopstick() 
+	{
+		pthread_cond_destroy(&cond);
+		pthread_mutex_destroy(&mutex);
+	}
+
 };
 
-pthread_mutex_t spoon;
-pthread_cond_t spoon_free;
-void* use_spoon(void* data)
+void* feed(void* data);
+class apostle 
 {
-	thread_data* tdata{static_cast<thread_data*>(data)};
-	while (tdata->spoonfuls < 20
-		&& 
-		0 == pthread_mutex_lock(&spoon) 
-		&&
-		0 == pthread_cond_wait(&spoon_free,&spoon)) 
+public: 
+	struct thread_data
 	{
-		cout << "Apostle " << tdata->name << " thread id " << pthread_self() 
-			<< " acquired spoon at count: " << tdata->spoonfuls << endl;
-		++tdata->spoonfuls;
-		pthread_cond_signal(&spoon_free);
-		pthread_mutex_unlock(&spoon);
+		vector<apostle> &v;
+		const size_t index;
+	};
+	thread_data td;
+	pthread_t thread;
+	const string & name;
+	unsigned mouthfuls;
+	chrono::seconds sec;
+	chopstick &left, &right;
+
+	pthread_t& get_thread() { return thread; } 
+
+	apostle(const string &s, chopstick &l, chopstick &r, vector<apostle>& v, const size_t index): 
+		name(move(s)), left(l), right(r), mouthfuls(0), td({v,index})
+	{
+		pthread_create(&thread, nullptr, feed, static_cast<void*>( &td));
+	};
+
+};
+
+
+
+void* feed(void* data)
+{
+	const apostle::thread_data & td = *static_cast<apostle::thread_data*>(data);
+	apostle &a = td.v[td.index];  // <-- dangerous, &a could be changed if vector resizes
+	while (a.mouthfuls < 20)
+	{
+		pthread_mutex_lock(&a.left.mutex);
+		pthread_cond_wait(&a.left.cond,&a.left.mutex);
+		pthread_mutex_lock(&a.right.mutex);
+		pthread_cond_wait(&a.right.cond,&a.right.mutex);
+		cout << "Apostle " << a.name << " thread id " << pthread_self() 
+			<< " acquired spoon at count: " << a.mouthfuls << endl;
+		++a.mouthfuls;
+		pthread_cond_signal(&a.left.cond);
+		pthread_cond_signal(&a.right.cond);
+		pthread_mutex_unlock(&a.right.mutex);
+		pthread_mutex_unlock(&a.left.mutex);
 	}
 	return nullptr;
 }
 
 int main (int argc, char const * argv[])
 {
-	vector<string> apostles {"John", "Luke", "Peter", "James", "Judha", "Paul", "Bartholomew", "Matthew", "Philip", "Simon", "Thomas" };
-	vector<thread_data> v;
-	for (vector<string>::iterator it=apostles.begin(); it<apostles.end(); ++it) 
-	{ 
-		thread_data td;
-		td.name = *it;
-		td.spoonfuls = 0;
-		td.sec = chrono::seconds(5);
-		v.push_back(td);
-	}
-	
-	pthread_mutex_init(&spoon, nullptr);
-	pthread_cond_init(&spoon_free, nullptr);
-	for (vector<thread_data>::iterator it=v.begin(); it < v.end(); ++it) 
-		pthread_create(&it->thread, nullptr, use_spoon, &*it);
+	array<string, 12> names {"John", "Luke", "Peter", "James", "Judha", "Paul", "Bartholomew", "Matthew", "Philip", "Simon", "Thomas", "Juddhas" };
+	//array<string, 2> names {"John","Luke"};
+	array<chopstick,names.size()> sticks;
+	vector<apostle> apostles;
 
-	cout << "Press any key to continue... " << endl;
-	string input;
-	getline(cin,input);
-	pthread_cond_signal(&spoon_free);
-	chrono::seconds  pause(5);
-	hello_and_pause(&pause);
-	for (thread_data td: v) 
-		pthread_join(td.thread, nullptr);
+	for (int i=0; i+1<names.size(); ++i)
+		apostles.emplace_back( names[i],sticks[i],sticks[i+1], apostles, i );  // <-- danger!! elements could be relocated elsewhere causing segfault in feed() function
+
+	apostles.emplace_back(names[names.size()-1], sticks[0],sticks[names.size()-1], apostles, names.size()-1);
+	for (chopstick& stick: sticks) pthread_cond_signal(&stick.cond);
+	for (apostle&  a: apostles) pthread_join(a.get_thread(), nullptr);
 	
 	return 0;
 
