@@ -92,8 +92,12 @@ int main (int argc, char const * argv[])
 		apostles[i]=apostle(names[i],&sticks[i],&sticks[i+1]);
 
 	apostles[names.size()-1] = apostle(names[names.size()-1], &sticks[0],&sticks[names.size()-1]);
+
 	while(true)
+	{
 		for (chopstick& stick: sticks)   pthread_cond_signal(&stick.cond); 
+		pthread_yield_np();
+	}
 
 	for (apostle&  a: apostles) pthread_join(a.get_thread(), nullptr);
 	
