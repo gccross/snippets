@@ -31,10 +31,10 @@ using namespace std;
 struct Node 
 { 
 	int data; 
-	Node *left{nullptr}, *right{nullptr};
+	Node& left{nullptr}, *right{nullptr};
 
 	Node(int x) : data(x), left(nullptr), right(nullptr) {}
-	Node(int x, Node *left, Node *right) : data(x), left(left), right(right) {}
+	Node(int x, Node& left, Node& right) : data(x), left(left), right(right) {}
 };
 
 /**
@@ -43,7 +43,7 @@ struct Node
 class BSTIterator {
 public:
 	/* ctor */
-	BSTIterator(Node* root) 
+	BSTIterator(Node& root) 
 	{
 		if (!root) return;
 		dq.push(root);
@@ -55,11 +55,11 @@ public:
 	/* @return the next smallest number */
 	int next() 
 	{
-		Node* n = dq.top();
+		Node& n = dq.top();
 		dq.pop();
 		int ret =  n->data;
 
-		Node* right = n->right;
+		Node& right = n->right;
 		while (right)
 		{
 			dq.push(right);
@@ -73,13 +73,13 @@ public:
 		return (!dq.empty());
 	}
 private:
-	stack<Node*> dq;
+	stack<Node&> dq;
 
 };
 
 
 /* A utility function to insert a new node with given key in BST */
-Node* insert(Node* node, int data) 
+Node& insert(Node& node, int data) 
 { 
 	/* If the tree is empty, return a new node */
 	if (node == nullptr) return new Node(data); 
