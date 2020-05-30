@@ -93,7 +93,7 @@ int main (int argc, char const * argv[])
 
 	apostles[names.size()-1] = apostle(names[names.size()-1], &sticks[0],&sticks[names.size()-1]);
 
-	while(true)
+	while(true) // change this and check everyone has finished eating. 
 	{
 		for (chopstick& stick: sticks)   pthread_cond_signal(&stick.cond); 
 		pthread_yield_np();
