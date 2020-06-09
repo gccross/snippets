@@ -64,14 +64,13 @@ public:
 void* feed(void* data)
 {
 	apostle & a = *static_cast<apostle*>(data);
-	while (a.mouthfuls < 20)
+	while (true) 
 	{
 		pthread_mutex_lock(&a.left->mutex);
 		while (!a.left->on_table)
 		{
 			pthread_cond_wait(&a.left->cond,&a.left->mutex);
 		}
-		a.left->on_table = false;
 
 		pthread_mutex_lock(&a.right->mutex);
 		while (!a.right->on_table)
