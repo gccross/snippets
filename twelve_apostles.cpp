@@ -19,7 +19,8 @@ struct chopstick
 {
 	pthread_mutex_t mutex;
 	pthread_cond_t cond;
-	chopstick()
+	bool on_table;
+	chopstick(): on_table(true)
 	{
 		pthread_mutex_init(&mutex,nullptr);
 		pthread_cond_init(&cond,nullptr);
@@ -66,15 +67,27 @@ void* feed(void* data)
 	while (a.mouthfuls < 20)
 	{
 		pthread_mutex_lock(&a.left->mutex);
-		pthread_cond_wait(&a.left->cond,&a.left->mutex);
+		while (!a.left->on_table)
+		{
+			pthread_cond_wait(&a.left->cond,&a.left->mutex);
+		}
+		a.left->on_table = false;
+
 		pthread_mutex_lock(&a.right->mutex);
-		pthread_cond_wait(&a.right->cond,&a.right->mutex);
+		while (!a.right->on_table)
+		{
+			pthread_cond_wait(&a.right->cond,&a.right->mutex);
+		}
+		a.right->on_table = false;
+
 		cout << "Apostle " << a.name << " thread id " << pthread_self() 
 			<< " acquired spoon at count: " << a.mouthfuls << endl;
 		++a.mouthfuls;
+		a.left->on_table = true;
+		a.right->on_table = true;
 		pthread_mutex_unlock(&a.right->mutex);
-		pthread_cond_signal(&a.right->cond);
 		pthread_mutex_unlock(&a.left->mutex);
+		pthread_cond_signal(&a.right->cond);
 		pthread_cond_signal(&a.left->cond);
 	}
 	return nullptr;
@@ -92,12 +105,6 @@ int main (int argc, char const * argv[])
 		apostles[i]=apostle(names[i],&sticks[i],&sticks[i+1]);
 
 	apostles[names.size()-1] = apostle(names[names.size()-1], &sticks[0],&sticks[names.size()-1]);
-
-	while(true) // change this and check everyone has finished eating. 
-	{
-		for (chopstick& stick: sticks)   pthread_cond_signal(&stick.cond); 
-		pthread_yield_np();
-	}
 
 	for (apostle&  a: apostles) pthread_join(a.get_thread(), nullptr);
 	
