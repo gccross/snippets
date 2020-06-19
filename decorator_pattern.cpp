@@ -101,6 +101,41 @@ public:
 	}
 };
 
+// from http://www.angelikalanger.com/Articles/Cuj/05.Manipulators/Manipulators.html
+
+template <class Manip> class manipBase {
+public:
+	template <class Stream>
+	Stream& manipulate(Stream& str) const
+	{ ...
+		// call Manip::fct()
+		static_cast<const Manip&>(*this).fct(str);
+	}
+};
+
+class multi : public manipBase<multi> {
+public:
+	multi(char c, size_t n): manipBase<multi>(*this), how_many_(n), what_(c) {}
+private:
+	const size_t how_many_;
+	const char what_;
+public:
+	template <class Ostream>
+	Ostream& fct(Ostream& os) const
+	{
+		for (unsigned int i=0; i<how_many_; ++i)
+				os.put(what_);
+		os.flush();
+		return os;
+	}
+};
+
+template <class Ostream, class Manip>
+Ostream& operator<< (Ostream& os, const manipBase<Manip>& m)
+{ 
+		return m.manipulate(os); 
+}
+
 int main(const int argc, const char * const argv[])
 {
 	TransparentShape t(ColouredShape(Square(3), "green"), 225);
