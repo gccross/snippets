@@ -103,13 +103,13 @@ public:
 
 // from http://www.angelikalanger.com/Articles/Cuj/05.Manipulators/Manipulators.html
 
-template <class Manip> class manipBase {
+template <class T> class manipBase {
 public:
-	template <class Stream>
-	Stream& manipulate(Stream& str) const
-	{ ...
-		// call Manip::fct()
-		static_cast<const Manip&>(*this).fct(str);
+	template <class OS>
+	OS& manipulate(OS& strm) const
+	{ 
+		// call T::fct()
+		return static_cast<const T&>(*this).fct(strm);
 	}
 };
 
@@ -120,8 +120,8 @@ private:
 	const size_t how_many_;
 	const char what_;
 public:
-	template <class Ostream>
-	Ostream& fct(Ostream& os) const
+	template <class OS>
+	OS& fct(OS& os) const
 	{
 		for (unsigned int i=0; i<how_many_; ++i)
 				os.put(what_);
@@ -130,8 +130,8 @@ public:
 	}
 };
 
-template <class Ostream, class Manip>
-Ostream& operator<< (Ostream& os, const manipBase<Manip>& m)
+template <class OS, class T>
+OS& operator<< (OS& os, const manipBase<T>& m)
 { 
 		return m.manipulate(os); 
 }
@@ -146,7 +146,7 @@ int main(const int argc, const char * const argv[])
 	ColouredShape_static<TransparencyDecorator<Square>> myshape("fushia",35,7) ;
 	std::cout << myshape.str() << "\n";
 	myshape.resize(1.5);
-	std::cout << myshape.str() << "\n";
+	std::cout << myshape.str() << multi('v',5) ;
 
 	return 0;
 }
