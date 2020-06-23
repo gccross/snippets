@@ -19,11 +19,8 @@ struct value
 template <typename T>
 struct my_trait
 {
-	static const bool value;
+	constexpr static bool value = (sizeof(typename T::value_type) != 0);
 };
-
-template <typename T>
-const bool my_trait<T>::value  = (sizeof(typename T::value_type) != 0);
 
 struct Foo
 {
