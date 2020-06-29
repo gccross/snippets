@@ -48,6 +48,27 @@ vector<int> dfs(vector<int> g[], int N)
 	}
 	return res;
 }
+
+vector<int> bfs(vector<int> g[], int N)
+{
+	vector<int> res;
+	vector<int> vis(N,false);
+	deque<int> dq;
+	dq.push_back(0);
+	while (!dq.empty())
+	{
+		int node = dq.front();
+		dq.pop_front();
+		if (!vis[node])
+		{
+			res.push_back(node);
+			vis[node] = true;
+			for (vector<int>::const_iterator it = g[node].cbegin(); it != g[node].cend(); ++it)
+				dq.push_back(*it);
+		}
+	}
+	return res;
+}
 // { Driver Code Starts.
 
 int main()
@@ -73,10 +94,24 @@ int main()
             g[v].push_back(u);
         }
 
+		{
+        vector <int> res = dfs_recurse(g, N);
+        for (int i = 0; i < res.size (); i++)
+            cout << res[i] << " ";
+        cout<<endl;
+		}
+		{
         vector <int> res = dfs(g, N);
         for (int i = 0; i < res.size (); i++)
             cout << res[i] << " ";
         cout<<endl;
+		}
+		{
+        vector <int> res = bfs(g, N);
+        for (int i = 0; i < res.size (); i++)
+            cout << res[i] << " ";
+        cout<<endl;
+		}
 
     }
 	return 0;
