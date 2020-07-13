@@ -14,49 +14,60 @@ using namespace std;
 */
 bool isCyclic(int V, vector<int> adj[])
 {
-    for (int i=0; i<V; ++i)
+#ifdef DEBUG
+	for (int i=0; i<V; ++i)
 	{
 		cout << i << ":\t" ;
 		copy (adj[i].begin(), adj[i].end(), ostream_iterator<int>(cout, "\t"));
 		cout << endl;
 	}
-	vector<bool> vis(V,false);
-    for (int i=0; i<V ; ++i)
-    {
-        if (adj[i].empty()) continue;
-        
-		bool vis[V]; memset(vis,false,sizeof(vis));
-		vis[i] = true;
+#endif	
 
-        stack<pair<int,int> stk;
-        stk.push(make_pair(i,0));
-        
-        while (!stk.empty())
-        {
-            int node = stk.top().first(); 
-			int child_index = stk.top().second();
+	bool vis_origin[V]; memset(vis_origin,false,sizeof(vis_origin));
+
+	for (int i=0; i<V ; ++i)
+	{
+		if (adj[i].empty() || vis_origin[i]) continue;
+
+
+		stack<pair<int,int>> stk;
+		stk.push(make_pair(i,0));
+
+
+		while (!stk.empty())
+		{
+			int node = stk.top().first; 
+			int child_index = stk.top().second;
 			int child = adj[node][child_index];
 
-            while (!adj[child].empty())
-            {
+			stk.pop();
+			if (++child_index < adj[node].size())
+				stk.push(make_pair(node,child_index));
+			else
+				vis_origin[node] = true;
+
+			bool vis[V]; memset(vis,false,sizeof(vis));
+			vis[node] = true;
+
+#ifdef DEBUG
+			cout << "node: " << node << "\tchild: " << child << endl;
+#endif
+
+			while (!adj[child].empty())
+			{
 				node = child;
 				child_index = 0;
-				child = adj[node][child_index];
-				if (vis[node]) return true;
-				stk.push(make_pair(node,child_index));
-
+				if (vis[node]) 
+					return true;
+				if (vis_origin[node]) break;
 				vis[node] = true;
-            }
 
-			if (!child_index < adj[node].size())
-			{
-				stk.push(make_pair(node,++child_index));
+				stk.push(make_pair(node,child_index));
+				child = adj[node][child_index];
 			}
-			else 
-				stk.pop();
-        }
-    }
-    return false;
+		}
+	}
+	return false;
 }
 
 // { Driver Code Starts.
@@ -79,7 +90,9 @@ int main() {
 	        adj[u].push_back(v);
 	    }
 	    
+		chrono::time_point<chrono::system_clock> t1 = chrono::system_clock::now();
 	    cout << isCyclic(v, adj) << endl;
+		cout << "executed in: " << (chrono::system_clock::now() - t1).count() << " milliseconds" << endl;
 	    
 	}
 	
@@ -142,9 +155,11 @@ while (!stk.empty())
 	while (!node.right)
 	{
 		stk.pop(); 
-		node = stk.top(); // fail!!!
+		if (stk.empty()) return;
+		node = stk.top(); 
 		cout << node.data;
 	}
+	stk.pop();
 	stk.push(node.right);
 
 }
