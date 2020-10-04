@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
-#include <vector>
+#include <queue>
 
 using namespace std;
 
@@ -31,21 +31,23 @@ void floydwarshall(int* ans, int n)
 
 void djikstra(int*adj, int* ans, int n)
 {
-	vector<int> stk(8192,0);
-	int stk_top = 0;
 	for (int i=0; i<n; ++i)
 	{
-		stk[++stk_top] = i;
+		auto comp = [](pair<int,int> a,pair<int,int> b){ return a.second < b.second;};
+		priority_queue<pair<int,int>,vector<pair<int,int>>,decltype(comp)> pq(comp);
+		pq.push(make_pair(i,0));
 		*(ans+i*n+i) = 0;
-		while (stk_top)
+		while (!pq.empty())
 		{
-			int node = stk[stk_top--];
+			pair<int,int> node = pq.top();
+			pq.pop();
+
 			for (int j=0; j<n; ++j)
 			{
-				if (0<=at(adj,n,node,j) && at(ans,n,i,j) > at(ans,n,i,node) + at(adj,n,node,j))
+				if (0<at(ans,n,node.first,j) && at(ans,n,i,j) > at(ans,n,i,node.first) + at(adj,n,node.first,j))
 				{
-					*(ans+i*n+j) = at(ans,n,i,node) + at(adj,n,node,j);
-					stk[++stk_top] = j;
+					*(ans+i*n+j) = at(ans,n,i,node.first) + at(adj,n,node.first,j);
+					pq.push(make_pair(j,*(ans+i*n+j)));
 				}
 			}
 		}
